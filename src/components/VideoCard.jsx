@@ -9,7 +9,6 @@ const VideoCard = ({ info }) => {
 
   return (
     <div className="
-      
        relative
       w-[380px] 
       p-2

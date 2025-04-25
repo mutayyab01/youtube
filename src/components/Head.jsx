@@ -1,8 +1,8 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { toggleMenu } from '../utils/appSlice'
 import YouTubeLogo from './YouTubeLogo';
-import { Link } from 'react-router-dom';
+import Search from './Search';
 const Head = () => {
   const dispatch = useDispatch()
   const toogleMenuHandler = () => {
@@ -10,10 +10,10 @@ const Head = () => {
 
   }
   return (
-    <div className="flex items-center justify-between px-4 py-2 bg-white shadow-sm">
+    <div className="flex items-center justify-between px-4 py-2 bg-white w-full fixed z-10">
       {/* Left section - Logo and menu */}
-      <div className="flex items-center gap-4">
-        <button 
+      <div className="flex items-center gap-4 ">
+        <button
           className="p-2 rounded-full hover:bg-gray-100"
           onClick={toogleMenuHandler}
         >
@@ -42,28 +42,7 @@ const Head = () => {
       {/* Middle section - Search bar */}
       <div className="flex flex-1 justify-center max-w-xl">
         <div className="flex w-full">
-          <input
-            type="text"
-            placeholder="Search"
-            className="w-full px-4 py-2 border border-gray-300 rounded-l-full focus:outline-none focus:border-blue-500"
-          />
-          <button className="px-5 py-2 bg-gray-100 border border-l-0 border-gray-300 rounded-r-full hover:bg-gray-200">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="lucide lucide-search"
-            >
-              <circle cx="11" cy="11" r="8" />
-              <path d="m21 21-4.3-4.3" />
-            </svg>
-          </button>
+          <Search />
         </div>
         <button className="ml-4 p-2 rounded-full hover:bg-gray-100">
           <svg

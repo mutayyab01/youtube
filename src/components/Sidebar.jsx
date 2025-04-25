@@ -119,7 +119,7 @@ const SidebarSection = ({ title, icon, items, showChevron = false }) => (
 const SubscriptionItem = ({ name }) => (
   <div className="flex items-center px-2 py-1 hover:bg-gray-100 rounded-lg cursor-pointer h-10">
     <div>
-      <img src='/assests/loveIcon.jpg' alt="Icon" srcset="" className="w-6 h-6 rounded-full bg-gray-300 flex items-center justify-center mr-3 overflow-hidden" />
+      <img src='/assests/loveIcon.jpg' alt="Icon" className="w-6 h-6 rounded-full bg-gray-300 flex items-center justify-center mr-3 overflow-hidden" />
     </div>
     <span className="font-medium text-sm">{name}</span>
   </div>
