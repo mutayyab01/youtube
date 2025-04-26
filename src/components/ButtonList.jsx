@@ -26,7 +26,7 @@ const ButtonList = () => {
   };
 
   return (
-    <div className="w-[100%] fixed z-10 mt-14 bg-white mx-20">
+    <div className="w-[100%] fixed z-1 mt-14 bg-white mx-20">
       <div className="flex items-center mr-10">
         {/* Scrollable Filters */}
         <div 
