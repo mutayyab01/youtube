@@ -1,10 +1,12 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { cacheResults } from '../utils/SearchSlice';
 import { YOUTUBE_SUGGESTION_API } from '../utils/Constants';
 
 const Search = ({ initialQuery = '' }) => {
+    const navigate = useNavigate();
+
     const [searchQuery, setSearchQuery] = useState('');
     const [suggestions, setSuggestions] = useState([]);
     const [showSuggestions, setShowSuggestions] = useState(false);
@@ -70,7 +72,11 @@ const Search = ({ initialQuery = '' }) => {
         }
     };
 
-    const handleSearch = () => {
+    const handleSearch = (e) => {
+        e?.preventDefault();
+        if (searchQuery.trim()) {
+            navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
+        }
         setShowSuggestions(false);
     };
 
