@@ -4,6 +4,7 @@ import CommantContainer from './CommantContainer';
 import { FormatViews } from './FormatViews';
 import RelativeTime from './RelativeTime';
 import LiveChat from './LiveChat';
+import { YOUTUBE_FETCH_CHANNEL_DETAILS_API, YOUTUBE_FETCH_VIDEO_DETAILS_API } from '../utils/Constants';
 
 // VideoPlayer component remains the same
 const VideoPlayer = ({ videoId }) => {
@@ -115,17 +116,13 @@ const WatchPage = () => {
       try {
         setLoading(true);
         // Fetch video details
-        const response = await fetch(
-          `https://youtube.googleapis.com/youtube/v3/videos?part=snippet%2CcontentDetails%2Cstatistics&id=${videoId}&key=${import.meta.env.VITE_YOUTUBE_API_KEY}`
-        );
+        const response = await fetch(`${YOUTUBE_FETCH_VIDEO_DETAILS_API}&id=${videoId}`);
         const data = await response.json();
         setVideoDetails(data.items[0]);
 
         // Fetch channel details
         if (data.items[0]?.snippet?.channelId) {
-          const channelResponse = await fetch(
-            `https://youtube.googleapis.com/youtube/v3/channels?part=snippet%2Cstatistics&id=${data.items[0].snippet.channelId}&key=${import.meta.env.VITE_YOUTUBE_API_KEY}`
-          );
+          const channelResponse = await fetch(`${YOUTUBE_FETCH_CHANNEL_DETAILS_API}&id=${data.items[0].snippet.channelId}`);
           const channelData = await channelResponse.json();
           setChannelDetails(channelData.items[0]);
         }
@@ -159,13 +156,11 @@ const WatchPage = () => {
               channelStatistics={channelDetails?.statistics}
             />
             {channelDetails && <ChannelInfo data={channelDetails} />}
-            {/* <CommentsSection commentCount={videoDetails.statistics.commentCount} /> */}
             <CommantContainer videoId={videoId} commentCount={videoDetails.statistics.commentCount} />
           </div>
 
           {/* Sidebar */}
           <div className="lg:w-1/3 mt-8 lg:mt-0">
-            {/* <SuggestionsSidebar videoId={videoId} /> */}
             <LiveChat />
           </div>
         </div>

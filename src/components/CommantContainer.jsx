@@ -1,192 +1,146 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Comment from './Comment';
-import { Link } from 'react-router-dom';
-
-const commentsData = [
-  {
-    id: 1,
-    name: "Mutayyab Imran",
-    text: "I am a Full Stack .NET Developer.",
-    time: "3d",
-    likes: 11,
-    replies: [
-      {
-        id: 2,
-        name: "Misha Shaikh",
-        text: "Hi Mutayyab Imran, I am also a Full Stack .NET Developer.",
-        time: "2d",
-        likes: 2,
-        replies: []
-      },
-      {
-        id: 3,
-        name: "Bilal Ali Khan",
-        text: "I am a Full Stack .NET Developer too.",
-        time: "2d",
-        likes: 1,
-        replies: [
-          {
-            id: 4,
-            name: "Miran Hussain",
-            text: "That's great!",
-            time: "1d",
-            likes: 10,
-            replies: []
-          }
-        ]
-      },
-      {
-        id: 4,
-        name: "Arsalan Irfan",
-        text: "Entity Framework is a great tool.",
-        time: "3d",
-        likes: 0,
-        replies: [
-          {
-            id: 5,
-            name: "Fayaz Ahmed",
-            text: "ASP.NET Core is the future.",
-            time: "3d",
-            likes: 0,
-            replies: []
-          },
-          {
-            id: 6,
-            name: "Tariq Khan",
-            text: "C# is a powerful language.",
-            time: "3d",
-            likes: 0,
-            replies: []
-          }
-        ]
-      }
-    ]
-  },
-  {
-    id: 5,
-    name: "Minhaj Paracha",
-    text: "React is a great library for building user interfaces.",
-    time: "3d",
-    likes: 10,
-    replies: [
-      {
-        id: 6,
-        name: "Anusha Ibrahim",
-        text: "I love React!",
-        time: "2d",
-        likes: 1,
-        replies: [
-          {
-            id: 7,
-            name: "Abdull Hannan Abbasi",
-            text: "React is awesome!",
-            time: "3d",
-            likes: 0,
-            replies: [
-              {
-                id: 8,
-                name: "Miran Hussain",
-                text: "I prefer Vue.js.",
-                time: "1d",
-                likes: 0,
-                replies: []
-              },
-              {
-                id: 9,
-                name: "Tariq Khan",
-                text: "Angular is better.",
-                time: "1d",
-                likes: 0,
-                replies: []
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  },
-  {
-    id: 6,
-    name: "Hussain",
-    text: "I can help you with your project.",
-    time: "1d",
-    likes: 1,
-    replies: []
-  },
-  {
-    id: 7,
-    name: "Tariq Khan",
-    text: "Node.js is a great choice for backend development.",
-    time: "3d",
-    likes: 1,
-    replies: []
-  },
-  {
-    id: 8,
-    name: "Abdull Hannan Abbasi",
-    text: "Next.js is a great framework for server-side rendering.",
-    time: "3d",
-    likes: 1,
-    replies: []
-  }
-];
+import { YOUTUBE_COMMENTS_VIDEO_API } from '../utils/Constants';
 
 const CommentContainer = ({ videoId, commentCount }) => {
-  const [comments, setComments] = useState(commentsData);
-  const [newComment, setNewComment] = useState('');
+  const [comments, setComments] = useState([]);
+  const [nextPageToken, setNextPageToken] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [hasMore, setHasMore] = useState(true);
 
-  const handleAddComment = () => {
-    if (newComment.trim() === '') return;
-
-    const comment = {
-      id: Math.max(...comments.map(c => c.id)) + 1,
-      name: "You",
-      text: newComment,
-      time: "Just now",
-      likes: 0,
-      replies: []
+  // Fetch initial comments
+  useEffect(() => {
+    const fetchComments = async () => {
+      setIsLoading(true);
+      setError(null);
+      
+      try {
+        const response = await fetch(
+          `${YOUTUBE_COMMENTS_VIDEO_API}&videoId=${videoId}&maxResults=20`
+        );
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch comments');
+        }
+        
+        const data = await response.json();
+        setComments(data.items || []);
+        setNextPageToken(data.nextPageToken || '');
+        setHasMore(!!data.nextPageToken);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setIsLoading(false);
+      }
     };
 
-    setComments([...comments, comment]);
-    setNewComment('');
+    if (videoId) {
+      fetchComments();
+    }
+  }, [videoId]);
+
+  const loadMoreComments = async () => {
+    if (isLoading || !hasMore) return;
+    
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      const response = await fetch(
+        `${YOUTUBE_COMMENTS_VIDEO_API}&videoId=${videoId}&maxResults=20&pageToken=${nextPageToken}`
+      );
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch more comments');
+      }
+      
+      const data = await response.json();
+      setComments(prev => [...prev, ...(data.items || [])]);
+      setNextPageToken(data.nextPageToken || '');
+      setHasMore(!!data.nextPageToken);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
+
+  // Process comments data
+  const processComments = (items) => {
+    return items.map(item => {
+      const topLevelComment = item.snippet.topLevelComment.snippet;
+      return {
+        id: item.id,
+        name: topLevelComment.authorDisplayName,
+        text: topLevelComment.textDisplay,
+        time: formatTime(topLevelComment.publishedAt),
+        likes: topLevelComment.likeCount,
+        replies: item.replies?.comments?.map(reply => ({
+          id: reply.id,
+          name: reply.snippet.authorDisplayName,
+          text: reply.snippet.textDisplay,
+          time: formatTime(reply.snippet.publishedAt),
+          likes: reply.snippet.likeCount,
+          replies: []
+        })) || []
+      };
+    });
+  };
+
+  // Format timestamp
+  const formatTime = (timestamp) => {
+    const now = new Date();
+    const commentDate = new Date(timestamp);
+    const diffInSeconds = Math.floor((now - commentDate) / 1000);
+    
+    if (diffInSeconds < 60) return 'Just now';
+    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
+    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
+    if (diffInSeconds < 2592000) return `${Math.floor(diffInSeconds / 86400)}d ago`;
+    if (diffInSeconds < 31536000) return `${Math.floor(diffInSeconds / 2592000)}mo ago`;
+    return `${Math.floor(diffInSeconds / 31536000)}y ago`;
+  };
+
+  const processedComments = processComments(comments);
 
   return (
     <div className="mt-6 max-w-2xl mx-auto">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-semibold">{commentCount} Comments</h2>
+        <h2 className="text-xl font-semibold">{commentCount || processedComments.length} Comments</h2>
       </div>
-
-      <div className="flex mb-6">
-        <div className="w-10 h-10 rounded-full bg-gray-300 overflow-hidden mr-3 flex-shrink-0">
-          <img
-            src="https://randomuser.me/api/portraits/men/1.jpg"
-            alt="User"
-            className="w-full h-full object-cover"
-          />
+      
+      {error && (
+        <div className="text-red-500 mb-4">
+          Error loading comments: {error}
         </div>
-        <div className="flex-1">
-          <input
-            type="text"
-            value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
-            placeholder="Add a comment..."
-            className="w-full border-b border-gray-300 pb-2 focus:outline-none focus:border-black"
-            onKeyPress={(e) => e.key === 'Enter' && handleAddComment()}
-          />
+      )}
+      
+      {isLoading && !processedComments.length ? (
+        <div className="flex justify-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
         </div>
-      </div>
-      <div className="space-y-4">
-        {comments.map(comment => (
-          <Comment key={comment.id} data={comment} />
-        ))}
-      </div>
-      <Link to={"/"} className="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-purple-500 to-pink-500 group-hover:from-purple-500 group-hover:to-pink-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-purple-200 dark:focus:ring-purple-800 mt-5 mx-[50%] cursor-pointer">
-        <span className="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-transparent group-hover:dark:bg-transparent justify-center align-middle ">
-          Load More
-        </span>
-      </Link>
-
+      ) : (
+        <>
+          <div className="space-y-4">
+            {processedComments.map(comment => (
+              <Comment key={comment.id} data={comment} />
+            ))}
+          </div>
+          
+          {hasMore && (
+            <div className="flex justify-center mt-4">
+              <button 
+                onClick={loadMoreComments}
+                disabled={isLoading}
+                className="text-white bg-gradient-to-r from-purple-500 to-pink-500 hover:bg-gradient-to-l focus:ring-4 focus:outline-none focus:ring-purple-200 dark:focus:ring-purple-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 cursor-pointer"
+              >
+                {isLoading ? 'Loading...' : 'Load More Comments'}
+              </button>
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 };
