@@ -104,97 +104,6 @@ const ChannelInfo = ({ data }) => {
   );
 };
 
-// Updated VideoSuggestion component (no changes needed)
-const VideoSuggestion = ({ title, channel, views, time, isNew, thumbnail }) => {
-  return (
-    <div className="flex mb-4 cursor-pointer">
-      <div className="w-40 h-24 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0">
-        <img
-          src={thumbnail || "https://via.placeholder.com/160x90"}
-          alt="Thumbnail"
-          className="w-full h-full object-cover"
-        />
-      </div>
-      <div className="ml-3">
-        <h3 className="font-medium line-clamp-2">{title}</h3>
-        <p className="text-sm text-gray-600 mt-1">{channel}</p>
-        <div className="flex items-center text-xs text-gray-500 mt-1">
-          <span>{views}</span>
-          <span className="mx-1">•</span>
-          <span>{time}</span>
-          {isNew && <span className="ml-1 px-1 bg-gray-100 rounded text-gray-700">New</span>}
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// Updated SuggestionsSidebar to fetch related videos
-const SuggestionsSidebar = ({ videoId }) => {
-  const [suggestions, setSuggestions] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchRelatedVideos = async () => {
-      try {
-        const response = await fetch(
-          `https://youtube.googleapis.com/youtube/v3/search?part=snippet&relatedToVideoId=${videoId}&type=video&maxResults=5&key=${import.meta.env.VITE_YOUTUBE_API_KEY}`
-        );
-        const data = await response.json();
-
-        const formattedVideos = data.items.map(item => ({
-          id: item.id.videoId,
-          title: item.snippet.title,
-          channel: item.snippet.channelTitle,
-          views: `${Math.floor(Math.random() * 10) + 1}M views`, // Mock views since not in API response
-          time: new Date(item.snippet.publishedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short' }),
-          thumbnail: item.snippet.thumbnails?.medium?.url,
-          isNew: new Date(item.snippet.publishedAt) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
-        }));
-
-        setSuggestions(formattedVideos);
-      } catch (error) {
-        console.error("Error fetching related videos:", error);
-        // Fallback to some default suggestions
-        setSuggestions([
-          {
-            title: "Related Music Video 1",
-            channel: "Music Channel",
-            views: "5.2M views",
-            time: "3 months ago",
-            isNew: false,
-            thumbnail: "https://via.placeholder.com/160x90"
-          },
-          {
-            title: "Popular Song 2023",
-            channel: "Top Hits",
-            views: "12M views",
-            time: "8 months ago",
-            isNew: false,
-            thumbnail: "https://via.placeholder.com/160x90"
-          }
-        ]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchRelatedVideos();
-  }, [videoId]);
-
-  if (loading) {
-    return <div className="mt-2">Loading suggestions...</div>;
-  }
-
-  return (
-    <div className="mt-2">
-      {suggestions.map((video, index) => (
-        <VideoSuggestion key={index} {...video} />
-      ))}
-    </div>
-  );
-};
-
 const WatchPage = () => {
   const [searchParams] = useSearchParams();
   const videoId = searchParams.get("v");
@@ -239,8 +148,8 @@ const WatchPage = () => {
   }
 
   return (
-    <div className="bg-white min-h-screen mt-15 mx-15">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <div className="bg-white min-h-screen mt-15 ml-15 w-full">
+      <div className="w-full  mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="flex flex-col lg:flex-row">
           {/* Main content */}
           <div className="lg:w-2/3 lg:pr-8">

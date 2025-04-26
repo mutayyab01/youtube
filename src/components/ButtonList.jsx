@@ -35,7 +35,7 @@ const ButtonList = () => {
           style={{
             scrollbarWidth: 'none', // For Firefox
             msOverflowStyle: 'none', // For IE
-            '&::-webkit-scrollbar': { // For Chrome, Safari
+            '&::WebkitScrollbar': { // For Chrome, Safari
               display: 'none',
             },
           }}

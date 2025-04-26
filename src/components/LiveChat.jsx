@@ -36,7 +36,7 @@ const LiveChat = () => {
                     }));
                 })
                 .catch(error => {
-                    console.error('Error fetching data:', error);
+                    // console.error('Error fetching data:', error);
                 });
         }, 1500);
 
@@ -60,7 +60,7 @@ const LiveChat = () => {
     };
 
     return (
-        <div className="flex flex-col h-full bg-white border border-gray-200 rounded-lg overflow-hidden w-fill">
+        <div className="flex flex-col h-full bg-white border border-gray-200 rounded-lg overflow-hidden w-full">
             {/* Chat header with action buttons */}
             <div className="bg-gray-100 p-3 border-b border-gray-200 flex justify-between items-center">
                 <h2 className="font-semibold text-lg">Top chat</h2>

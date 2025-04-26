@@ -95,7 +95,7 @@ const Search = () => {
             </div>
 
             {showSuggestions && suggestions.length > 0 && (
-                <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg">
+                <div className="absolute w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg">
                     <ul>
                         {suggestions.map((suggestion, index) => (
                             <li

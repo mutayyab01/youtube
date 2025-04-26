@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux'
 import { toggleMenu } from '../utils/appSlice'
 import YouTubeLogo from './YouTubeLogo';
 import Search from './Search';
+import { Link } from 'react-router-dom';
 const Head = () => {
   const dispatch = useDispatch()
   const toogleMenuHandler = () => {
@@ -34,9 +35,9 @@ const Head = () => {
             <line x1="4" x2="20" y1="18" y2="18" />
           </svg>
         </button>
-        <a href="/" className="flex items-center">
+        <Link to={"/"} className="flex items-center">
           <YouTubeLogo />
-        </a>
+        </Link>
       </div>
 
       {/* Middle section - Search bar */}
