@@ -22,11 +22,15 @@ const LiveChat = () => {
     useEffect(() => {
         const intervalId = setInterval(() => {
             Promise.all([
-                fetch(RANDOM_USERNAME_API).then(res => res.json()),
+                fetch(RANDOM_USERNAME_API, {
+                    headers: {
+                        'X-Api-Key': `${import.meta.env.VITE_NINJA_API_KEY}` 
+                    }
+                }).then(res => res.json()),
                 fetch(RANDOM_COMMENT_API).then(res => res.json())
             ])
                 .then(([userData, commentData]) => {
-                    const username = `${userData.results[0].name.first} ${userData.results[0].name.last}`;
+                    const username = `${userData.username}`;
                     const comments = commentData.comments;
                     const randomIndex = Math.floor(Math.random() * comments.length);
                     const randomComment = comments[randomIndex].body;
@@ -109,15 +113,15 @@ const LiveChat = () => {
                 ))}
 
             </div>
-                {/* Welcome message */}
-                <div className="mt-4 pt-4 border-t border-gray-100 text-center text-sm text-gray-500">
-                    <p>Welcome to live chat! Remember to guard your privacy and abide by our community guidelines.</p>
-                </div>
+            {/* Welcome message */}
+            <div className="mt-4 pt-4 border-t border-gray-100 text-center text-sm text-gray-500">
+                <p>Welcome to live chat! Remember to guard your privacy and abide by our community guidelines.</p>
+            </div>
 
-                {/* Learn more section */}
-                <div className="text-center text-sm text-gray-500 mt-4">
-                    <p className="font-medium">Learn more</p>
-                </div>
+            {/* Learn more section */}
+            <div className="text-center text-sm text-gray-500 mt-4">
+                <p className="font-medium">Learn more</p>
+            </div>
 
             {/* Sign in / Message input */}
             {!isLoggedIn ? (

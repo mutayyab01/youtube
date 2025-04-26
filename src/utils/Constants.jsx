@@ -7,5 +7,5 @@ export const YOUTUBE_FETCH_CHANNEL_DETAILS_API=`https://youtube.googleapis.com/y
 export const YOUTUBE_SEARCH_RESULTS_API=`https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=20&type=video&key=${import.meta.env.VITE_YOUTUBE_API_KEY}`
 export const YOUTUBE_SUGGESTION_API=`https://corsproxy.io/?https://clients1.google.com/complete/search?client=youtube&gs_ri=youtube&ds=yt`;
 export const LIVE_CHAT_OFFSET_LIMIT= 10;
-export const RANDOM_USERNAME_API = `https://randomuser.me/api/`;
+export const RANDOM_USERNAME_API = `https://api.api-ninjas.com/v1/randomuser`;
 export const RANDOM_COMMENT_API = `https://dummyjson.com/comments?limit=10&skip=10&select=body,postId`;
